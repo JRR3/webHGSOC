@@ -1,17 +1,48 @@
-// let T = document.getElementById("masterTable");
+let anchors = document.getElementsByTagName("a");
+for (let anchor of anchors)
+{
+    anchor.onclick = updateCellColor;
+}
+
+let divMain = document.createElement("div");
+divMain.style.width = "100%";
+document.body.insertBefore(divMain,
+    document.body.firstChild);
+
+// There is only one table.
 let T = document.getElementsByTagName("table")[0];
 let rows = T.getElementsByTagName("tr");
 
+let divTable = document.createElement("div");
+// divTable.style.float = "left";
+// divTable.style.width = "800px";
+divTable.style.marginLeft = "300px";
+// divTable.display = "inline-block";
+divTable.appendChild(T);
+
+
+// This div is going to hold the menus for each
+// category.
 let divMenu = document.createElement("div");
-document.body.insertBefore(divMenu,
-    document.body.firstChild);
+// divMenu.display = "inline-block";
+divMenu.style.float = "left";
+// divMenu.style.width = "100px";
+divMenu.style.position = "fixed";
 
+divMain.appendChild(divMenu);
+divMain.appendChild(divTable);
+// document.body.insertBefore(divMenu,
+//     document.body.firstChild);
 
+// divMenu.appendChild(T);
 
 let indexToFeature = {};
 let featureToIndex = {};
 let list_of_menus  = [];
+
+// There is only one header.
 let header = T.getElementsByTagName("thead")[0];
+
 let titles = header.getElementsByTagName("th");
 let title_index = 0;
 for (let title of titles)
@@ -27,6 +58,10 @@ for (let title of titles)
 }
 
 let n_indices = title_index;
+
+// The following dictionary maps an index, as described
+// in the following comment, to a dictionary of types
+// for each category.
 let D = {};
 
 // let norm_index = 0;
@@ -52,27 +87,41 @@ for (let row of rows)
     }
 }
 
+// Create a menu (<select>) for each category.
+// The options available for each category are
+// given in the dictionary D[index].
 for(let [index, dict] of Object.entries(D))
 {
-    let title = indexToFeature[index];
-    let dropdown = document.createElement("select");
-    let span = document.createElement("span");
+
+    // Separate each menu using n spaces.
     let space = "&nbsp;";
-    let n_spaces = 3;
+    let n_spaces = 1;
     let big_space = "";
     for(let i = 0; i < n_spaces; i++)
     {
         big_space += space;
     }
+
+    // Include name and space before each menu.
+    let span = document.createElement("span");
+    let brk = document.createElement("br");
+    let title = indexToFeature[index];
     span.innerHTML = big_space + title;
-    divMenu.appendChild(span);
-    obj_id = title + "Menu";
+    // span.innerHTML = title;
+
+
+    let dropdown = document.createElement("select");
     dropdown.setAttribute("name", title);
     dropdown.addEventListener("input", filterTable);
+
+    // Create an option with all possible types.
     let option = document.createElement("option");
     option.value = "All";
     option.innerHTML = "All";
     dropdown.appendChild(option);
+
+    // Include options based on the dictionary D[index].
+    // The options are specific for each category.
     for (let[key, _] of Object.entries(dict))
     {
         let option = document.createElement("option");
@@ -81,10 +130,10 @@ for(let [index, dict] of Object.entries(D))
         dropdown.appendChild(option);
     }
     divMenu.appendChild(dropdown);
+    divMenu.appendChild(span);
+    divMenu.appendChild(brk);
     list_of_menus.push(dropdown);
 }
-
-// filterTable();
 
 function filterTable(event)
 {
@@ -126,4 +175,10 @@ function filterTable(event)
     }
 
 
+}
+
+function updateCellColor(event)
+{
+    let cell = event.currentTarget.parentNode;
+    cell.style.backgroundColor = "blue";
 }
